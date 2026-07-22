@@ -1,0 +1,55 @@
+name: Medishare CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Start Environment
+        run: docker-compose up -d
+
+      - name: Wait for services to boot
+        run: sleep 5
+
+      - name: Test if App is running
+        run: |
+          # Fetch the page and save it
+          curl -s -o -k response.html http://localhost:443
+          # Search for a specific word (Change "Welcome" to whatever the exam asks for)
+          grep "Welcome" response.html
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "Medishare"
+          path: "."
+          format: "HTML"
+          out: "pipeline-artifacts"
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+
+      - name: Upload Pipeline Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-artifacts
+          path: pipeline-artifacts
+
+      - name: Stop Docker
+        if: always() # This ensures the container stops even if your tests fail!
+        run: |
+          docker-compose down

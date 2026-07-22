@@ -1,0 +1,62 @@
+services:
+  # ==========================================
+  # 1. THE FRONT DOOR (NGINX REVERSE PROXY)
+  # ==========================================
+  medishare-proxy:
+    image: nginx:alpine
+    container_name: proxy-server
+    ports:
+      - "443:443"   
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # BOILERPLATE: Certbot shared folders (DO NOT CHANGE RIGHT SIDE)
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    networks:
+      - dmz_net  
+
+  # ==========================================
+  # 3. THE WORKER (YOUR BACKEND APP / API)
+  # ==========================================
+  medishare-api:
+    # Use 'image: <name>' if they give you an image, OR use 'build:' if they give a Dockerfile
+    build:
+      context: .
+      dockerfile: ./Dockerfile # Change path if Dockerfile is in a subfolder
+    container_name: main-app
+    # NOTICE: NO PORTS EXPOSED HERE! Hidden behind Nginx!
+    environment:
+      # How the app connects to the DB (Must match DB config below)
+      DB_HOST: medishare_db 
+      DB_USER: admin
+      DB_PASS: MediSecurePass!
+    networks:
+      - public_net   # To talk to Nginx
+      - private_net  # To talk to Database
+
+  # ==========================================
+  # 4. THE VAULT (DATABASE - MYSQL or POSTGRES)
+  # ==========================================
+  medishare-db:
+    image: postgres:14 # Change to postgres:13 if exam asks for Postgres!
+    container_name: app-db
+    restart: always
+    volumes:
+      # Persistent data mapping (Left side is your host folder, right side is container)
+      # For MySQL: /var/lib/mysql | For Postgres: /var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data 
+    environment:
+      POSTGRES_PASSWORD: MediSecurePass!
+      POSTGRES_DB: medishare_db
+      # If using Postgres, change these to POSTGRES_PASSWORD and POSTGRES_DB
+    networks:
+      - secure_net # Isolated! Nginx cannot reach this.
+
+# ==========================================
+# 5. NETWORKS DECLARATION
+# ==========================================
+networks:
+  dmz_net:
+    driver: bridge
+  secure_net:
+    driver: bridge

@@ -26,8 +26,13 @@ jobs:
         # run: npx eslint . --format sarif --output-file eslint-results.sarif
         run: npm run lint
 
-      - name: Run unti testing
-        # run: npx eslint . --format sarif --output-file eslint-results.sarif
+      # THIS IS FOR INTEGRATING WITH GITHUB CODE SCANNING / SECURITY DASHBOARD
+      # - name: Upload ESLint SARIF results
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: reports/eslint-results.sarif # Pointing to the generated SARIF file
+
+      - name: Run unit testing
         run: npm test
 
   dependency-scan:
@@ -44,10 +49,6 @@ jobs:
           path: "."
           format: "HTML"
           out: "scan-reports"
-          # NVD now rate-limits anonymous requests heavily (scans can take
-          # 30+ min or fail without a key). Request a free key at
-          # https://nvd.nist.gov/developers/request-an-api-key and store it as
-          # a repository secret named NVD_API_KEY.
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
