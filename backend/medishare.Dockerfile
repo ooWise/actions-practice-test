@@ -22,7 +22,7 @@ USER node
 
 # 6. EXPOSE: Tells Docker which port the container listens on
 # CHANGE THIS to match the port your app code actually runs on (e.g., 3000, 5000, 8080)
-EXPOSE 3000
+EXPOSE 443
 
 # 7. CMD / ENTRYPOINT: What the container executes when it starts
 # CHANGE THIS to run your app's startup command (e.g., ["npm", "start"] or ["python", "app.py"])
