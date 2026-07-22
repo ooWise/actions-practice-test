@@ -31,14 +31,6 @@ jobs:
         # run: npx eslint . --format sarif --output-file eslint-results.sarif
         run: npm test
 
-      - name: Run SonarQube Scanner via Docker
-        run: |
-          docker run --rm --network host -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli \
-           -Dsonar.projectKey=edusecure-prod \
-           -Dsonar.sources=/usr/src \
-           -Dsonar.host.url=https://sonar.sit.edu.sg \
-           -Dsonar.login=${{ secrets.SONAR_PROD_TOKEN }}
-
   dependency-scan:
     runs-on: ubuntu-latest
     needs: test-and-lint
@@ -65,12 +57,4 @@ jobs:
         with:
           name: Scan-reports
           path: scan-reports
-
-      - name: Run SonarQube Scanner via Docker
-        run: |
-          docker run --rm --network host -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli \
-           -Dsonar.projectKey=edusecure-prod \
-           -Dsonar.sources=/usr/src \
-           -Dsonar.host.url=https://sonar.sit.edu.sg \
-           -Dsonar.login=${{ secrets.SONAR_PROD_TOKEN }}
 
