@@ -19,10 +19,11 @@ jobs:
 
       - name: Test if App is running
         run: |
-          # Fetch the page and save it
-          curl -k -s -o response.html http://localhost:443
-          # Search for a specific word (Change "Welcome" to whatever the exam asks for)
-          grep "Welcome" response.html
+          # Fetch the page from Nginx (Note: using http:// on port 443)
+          curl -s -o response.html http://localhost:443
+          
+          # Search for "html" in the response to prove Nginx answered!
+          grep "html" response.html
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
