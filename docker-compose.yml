@@ -9,9 +9,6 @@ services:
       - "443:443"   
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      # BOILERPLATE: Certbot shared folders (DO NOT CHANGE RIGHT SIDE)
-      - ./certbot/www:/var/www/certbot
-      - ./certbot/conf:/etc/letsencrypt
     networks:
       - dmz_net  
 
@@ -22,7 +19,7 @@ services:
     # Use 'image: <name>' if they give you an image, OR use 'build:' if they give a Dockerfile
     build:
       context: .
-      dockerfile: ./Dockerfile # Change path if Dockerfile is in a subfolder
+      dockerfile: ./backend/Dockerfile # Change path if Dockerfile is in a subfolder
     container_name: main-app
     # NOTICE: NO PORTS EXPOSED HERE! Hidden behind Nginx!
     environment:
