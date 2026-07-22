@@ -20,7 +20,7 @@ jobs:
       - name: Test if App is running
         run: |
           # Fetch the page and save it
-          curl -s -o -k response.html http://localhost:443
+          curl -k -s -o response.html http://localhost:443
           # Search for a specific word (Change "Welcome" to whatever the exam asks for)
           grep "Welcome" response.html
 
